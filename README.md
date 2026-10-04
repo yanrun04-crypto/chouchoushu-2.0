@@ -2,273 +2,119 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
-<title>孤岛臭臭鼠</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>孤岛臭臭鼠快跑</title>
 
 <style>
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
-  user-select:none;
 }
-
 html,body{
   margin:0;
   width:100%;
   height:100%;
   overflow:hidden;
-  background:#73c9e7;
-  font-family:-apple-system,BlinkMacSystemFont,
-  "PingFang SC","Microsoft YaHei",sans-serif;
+  background:#07151b;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
 }
-
-body{
+canvas{
+  display:block;
+  width:100vw;
+  height:100vh;
   touch-action:none;
 }
-
-canvas{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-}
-
 #hud{
   position:fixed;
-  z-index:20;
-  top:0;
-  left:0;
-  right:0;
-  padding:calc(10px + env(safe-area-inset-top)) 12px 0;
-  pointer-events:none;
-  color:white;
-  text-shadow:0 2px 5px rgba(0,0,0,.35);
-}
-
-.hudRow{
+  top:calc(12px + env(safe-area-inset-top));
+  left:14px;
+  right:14px;
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
+  color:white;
+  z-index:10;
+  pointer-events:none;
 }
-
-.hudBox{
-  padding:7px 12px;
-  border-radius:16px;
-  background:rgba(20,65,80,.30);
-  border:1px solid rgba(255,255,255,.25);
+.box{
+  padding:8px 12px;
+  border-radius:14px;
+  background:rgba(0,0,0,.28);
   backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);
+  text-shadow:0 2px 4px #000;
 }
-
-.small{
-  font-size:11px;
-  opacity:.82;
-}
-
 .big{
   font-size:20px;
-  font-weight:900;
+  font-weight:800;
 }
-
-#statusBox{
-  margin-top:7px;
-  width:max-content;
+.small{
+  font-size:12px;
+  opacity:.75;
 }
-
-#power{
-  width:120px;
-  height:5px;
-  margin-top:5px;
-  border-radius:10px;
-  background:rgba(255,255,255,.22);
-  overflow:hidden;
+#intro{
+  position:fixed;
+  left:50%;
+  top:34%;
+  transform:translate(-50%,-50%);
+  color:white;
+  font-size:25px;
+  font-weight:800;
+  text-shadow:0 3px 10px #000;
+  opacity:0;
+  z-index:20;
+  pointer-events:none;
+  white-space:nowrap;
 }
-
-#powerFill{
-  width:0;
-  height:100%;
-  background:#ffe05c;
-  border-radius:10px;
-}
-
-.screen{
+#start,#over{
   position:fixed;
   inset:0;
-  z-index:50;
+  z-index:30;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:
-    linear-gradient(
-      #55bce8 0%,
-      #b8e7ee 57%,
-      #e5e8c8 100%
-    );
-}
-
-.panel{
-  width:min(88vw,420px);
-  padding:28px 22px 23px;
-  border-radius:28px;
-  background:rgba(255,255,255,.95);
-  box-shadow:0 25px 70px rgba(0,0,0,.22);
   text-align:center;
+  color:white;
+  background:linear-gradient(
+    rgba(0,15,20,.18),
+    rgba(0,15,20,.65)
+  );
 }
-
-h1{
-  margin:0;
-  color:#293c4c;
-  font-size:32px;
+.card{
+  width:min(88vw,420px);
+  padding:28px 22px;
+  border-radius:28px;
+  background:rgba(8,24,30,.72);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 20px 70px rgba(0,0,0,.4);
 }
-
+.title{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:2px;
+}
 .sub{
-  margin:7px 0 18px;
-  color:#73828d;
-  font-size:13px;
+  margin-top:8px;
+  opacity:.7;
 }
-
 button{
+  margin-top:22px;
   width:100%;
   border:0;
-  border-radius:17px;
+  border-radius:18px;
   padding:15px;
-  background:linear-gradient(#55cdf5,#178dcc);
-  color:white;
   font-size:18px;
-  font-weight:900;
-  box-shadow:0 5px 0 #0d6a98;
+  font-weight:800;
+  color:#07151b;
+  background:#ffe477;
 }
-
-button:active{
-  transform:translateY(4px);
-  box-shadow:0 1px 0 #0d6a98;
-}
-
+#over{display:none}
 .tip{
-  margin-top:15px;
-  color:#89949c;
-  font-size:12px;
-  line-height:1.8;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.mouseIcon{
-  width:105px;
-  height:105px;
-  margin:0 auto 15px;
-  border-radius:50%;
-  background:#a6785f;
-  position:relative;
-  box-shadow:
-    inset -14px -15px rgba(0,0,0,.10),
-    0 12px 22px rgba(0,0,0,.16);
-}
-
-.mouseIcon:before,
-.mouseIcon:after{
-  content:"";
-  position:absolute;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#b98a6d;
-  top:-9px;
-}
-
-.mouseIcon:before{
-  left:6px;
-}
-
-.mouseIcon:after{
-  right:6px;
-}
-
-.eye{
-  position:absolute;
-  width:8px;
-  height:12px;
-  border-radius:50%;
-  background:#172027;
-  top:43px;
-}
-
-.eye.l{
-  left:31px;
-}
-
-.eye.r{
-  right:31px;
-}
-
-.nose{
-  position:absolute;
-  left:50%;
-  top:60px;
-  transform:translateX(-50%);
-  width:12px;
-  height:9px;
-  border-radius:50%;
-  background:#e59ca7;
-}
-
-#introText{
-  position:fixed;
-  z-index:40;
-  left:50%;
-  bottom:18%;
-  transform:translateX(-50%);
-  color:white;
-  font-size:22px;
-  font-weight:900;
-  white-space:nowrap;
-  text-shadow:0 3px 9px rgba(20,55,70,.8);
-  opacity:0;
-  pointer-events:none;
-}
-
-#skip{
-  display:none;
-  position:fixed;
-  right:12px;
-  top:calc(12px + env(safe-area-inset-top));
-  z-index:45;
-  padding:7px 11px;
-  border-radius:15px;
-  color:white;
-  background:rgba(0,0,0,.25);
-  font-size:12px;
-}
-
-#toast{
-  position:fixed;
-  left:50%;
-  top:24%;
-  transform:translate(-50%,-50%);
-  z-index:45;
-  color:white;
-  font-size:27px;
-  font-weight:900;
-  text-shadow:0 3px 8px #234;
-  opacity:0;
-  pointer-events:none;
-}
-
-#hint{
-  position:fixed;
-  left:50%;
-  bottom:7%;
-  transform:translateX(-50%);
-  z-index:15;
-  color:white;
+  margin-top:14px;
   font-size:13px;
-  font-weight:700;
-  opacity:0;
-  pointer-events:none;
-  text-shadow:0 2px 5px rgba(0,0,0,.45);
+  opacity:.65;
+  line-height:1.7;
 }
 </style>
 </head>
@@ -278,142 +124,93 @@ button:active{
 <canvas id="game"></canvas>
 
 <div id="hud">
-
-  <div class="hudRow">
-
-    <div class="hudBox">
-      <div class="small">距离</div>
-      <div class="big">
-        <span id="distance">0</span> m
-      </div>
-    </div>
-
-    <div class="hudBox" style="text-align:right">
-      <div class="small">金币</div>
-      <div class="big">
-        🪙 <span id="coins">0</span>
-      </div>
-    </div>
-
+  <div class="box">
+    <div class="small">距离</div>
+    <div class="big"><span id="distance">0</span> m</div>
   </div>
 
-  <div id="statusBox" class="hudBox">
-
-    <div class="small">状态</div>
-
-    <div id="status">正常</div>
-
-    <div id="power">
-      <div id="powerFill"></div>
-    </div>
-
+  <div class="box">
+    🪙 <span id="coins">0</span>
   </div>
-
 </div>
 
-<div id="introText">你们好，我是臭臭鼠</div>
+<div id="intro">你们好，我是臭臭鼠</div>
 
-<div id="skip">跳过 ›</div>
-
-<div id="toast"></div>
-
-<div id="hint">左右滑动换道　↑ 上滑跳跃</div>
-
-
-<!-- 开始界面 -->
-
-<div id="startScreen" class="screen">
-
-  <div class="panel">
-
-    <div class="mouseIcon">
-      <i class="eye l"></i>
-      <i class="eye r"></i>
-      <i class="nose"></i>
-    </div>
-
-    <h1>孤岛臭臭鼠</h1>
-
-    <div class="sub">
-      原创海岛 · 3D感无限跑酷
-    </div>
-
-    <button id="startBtn">
-      开始奔跑
-    </button>
-
+<div id="start">
+  <div class="card">
+    <div class="title">孤岛臭臭鼠</div>
+    <div class="sub">海岛极速逃跑</div>
+    <button id="startBtn">开始游戏</button>
     <div class="tip">
       左右滑动：换道<br>
-      上滑：跳跃　下滑：快速落地<br>
-      收集金币，躲开障碍，跑得越远越好
+      上滑：跳跃
     </div>
-
   </div>
-
 </div>
 
-
-<!-- 游戏结束 -->
-
-<div id="gameOver" class="screen hidden">
-
-  <div class="panel">
-
-    <h1>跑到这里啦！</h1>
-
-    <div style="margin-top:20px;color:#7d8992">
-      本次距离
+<div id="over">
+  <div class="card">
+    <div class="title">游戏结束</div>
+    <div class="sub">
+      跑了 <b id="finalDistance">0</b> 米<br>
+      获得 🪙 <b id="finalCoins">0</b>
     </div>
-
-    <div id="finalDistance"
-    style="font-size:45px;font-weight:1000;color:#263b4b">
-      0m
-    </div>
-
-    <div style="margin-top:8px;color:#7d8992">
-      金币：<span id="finalCoins">0</span>
-    </div>
-
-    <div style="margin-top:6px;color:#7d8992">
-      最高：<span id="bestDistance">0</span>m
-    </div>
-
-    <button id="restartBtn" style="margin-top:18px">
-      再跑一次
-    </button>
-
+    <button id="restartBtn">再跑一次</button>
   </div>
-
 </div>
-
 
 <script>
-
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
-let W=innerWidth;
-let H=innerHeight;
-let DPR=Math.min(devicePixelRatio||1,2);
+let W=0,H=0,DPR=1;
 
 function resize(){
-
+  DPR=Math.min(devicePixelRatio||1,2);
   W=innerWidth;
   H=innerHeight;
 
   canvas.width=W*DPR;
   canvas.height=H*DPR;
-
-  canvas.style.width=W+"px";
-  canvas.style.height=H+"px";
-
   ctx.setTransform(DPR,0,0,DPR,0,0);
 }
-
 addEventListener("resize",resize);
 resize();
 
 const $=id=>document.getElementById(id);
+
+let game={
+  state:"menu",
+
+  distance:0,
+  coins:0,
+
+  lane:1,
+  targetLane:1,
+
+  jumpY:0,
+  jumpV:0,
+
+  speed:0.075,
+
+  objects:[],
+  particles:[],
+
+  spawnTimer:0,
+
+  time:0,
+
+  introTime:0,
+  introPlayed:false,
+
+  shake:0,
+
+  best:Number(localStorage.getItem("chouchoushuBest")||0)
+};
+
+/* =========================
+   基础工具
+========================= */
 
 function clamp(v,a,b){
   return Math.max(a,Math.min(b,v));
@@ -427,568 +224,340 @@ function rand(a,b){
   return a+Math.random()*(b-a);
 }
 
-function choose(a){
-  return a[Math.floor(Math.random()*a.length)];
+function choose(arr){
+  return arr[(Math.random()*arr.length)|0];
 }
 
+/* =========================
+   透视系统
+========================= */
 
-/* =====================================================
-   游戏状态
-===================================================== */
+const horizonRatio=.39;
 
-const G={
-
-  mode:"menu",
-
-  time:0,
-  last:0,
-
-  distance:0,
-  coins:0,
-
-  best:Number(
-    localStorage.getItem("chouchou_best")||0
-  ),
-
-  lane:1,
-  targetLane:1,
-
-  jump:0,
-  jumpVelocity:0,
-
-  speed:.055,
-
-  objects:[],
-
-  particles:[],
-
-  spawnTimer:1.8,
-
-  shield:0,
-  magnet:0,
-  boost:0,
-
-  shake:0,
-
-  introTime:0,
-
-  worldOffset:0,
-
-  lastPattern:0
-};
-
-
-/* =====================================================
-   透视
-===================================================== */
-
-function depth(z){
-
-  return Math.pow(
-    clamp(z,0,1),
-    1.55
-  );
+function horizon(){
+  return H*horizonRatio;
 }
 
+/*
+ z:
+ 1 = 很远
+ 0 = 玩家脚下
+*/
+
+function perspective(z){
+  return Math.pow(clamp(1-z,0,1),1.7);
+}
 
 function roadY(z){
-
-  return lerp(
-    H*.37,
-    H*1.08,
-    depth(z)
-  );
+  return lerp(horizon(),H*.94,perspective(z));
 }
-
 
 function roadWidth(z){
-
-  return lerp(
-    W*.095,
-    W*.92,
-    depth(z)
-  );
+  return lerp(W*.10,W*.82,perspective(z));
 }
-
-
-function curveAt(z){
-
-  let a=
-    Math.sin(
-      (G.distance+z*850)*.00135
-    )*W*.055;
-
-  let b=
-    Math.sin(
-      (G.distance+z*1500)*.00042
-    )*W*.028;
-
-  return a+b;
-}
-
 
 function laneX(lane,z){
+  const center=W/2;
+  const width=roadWidth(z);
 
-  return (
-    W/2+
-    curveAt(z)+
-    (lane-1)*roadWidth(z)*.235
-  );
+  return center+(lane-1)*width*.285;
 }
 
-
-/* =====================================================
-   背景
-===================================================== */
+/* =========================
+   天空
+========================= */
 
 function drawSky(){
 
-  let g=ctx.createLinearGradient(
+  let sky=ctx.createLinearGradient(
     0,0,0,H
   );
 
-  g.addColorStop(0,"#48b8e6");
-  g.addColorStop(.46,"#aee2ed");
-  g.addColorStop(1,"#e5e9cf");
+  sky.addColorStop(0,"#76cfe1");
+  sky.addColorStop(.48,"#b9e8e7");
+  sky.addColorStop(1,"#4b9e9c");
 
-  ctx.fillStyle=g;
+  ctx.fillStyle=sky;
   ctx.fillRect(0,0,W,H);
 
+  /* 太阳 */
+  ctx.beginPath();
+  ctx.arc(W*.78,H*.17,42,0,Math.PI*2);
+  ctx.fillStyle="rgba(255,239,171,.72)";
+  ctx.fill();
+
   /* 云 */
-
-  for(let i=0;i<6;i++){
-
-    let x=
-      ((i*280-G.distance*.012)
-      %(W+360))-180;
-
-    let y=
-      50+(i%3)*70;
-
-    ctx.fillStyle=
-      "rgba(255,255,255,.46)";
-
-    ctx.beginPath();
-
-    ctx.arc(x,y,23,0,Math.PI*2);
-    ctx.arc(x+30,y-8,31,0,Math.PI*2);
-    ctx.arc(x+62,y,22,0,Math.PI*2);
-
-    ctx.fill();
-  }
+  drawCloud(W*.18,H*.16,1);
+  drawCloud(W*.58,H*.11,.75);
+  drawCloud(W*.88,H*.28,.65);
 }
 
+function drawCloud(x,y,s){
+
+  ctx.save();
+  ctx.globalAlpha=.38;
+  ctx.fillStyle="#fff";
+
+  ctx.beginPath();
+  ctx.arc(x,y,25*s,0,Math.PI*2);
+  ctx.arc(x+25*s,y+5*s,19*s,0,Math.PI*2);
+  ctx.arc(x-25*s,y+8*s,18*s,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* =========================
+   海
+========================= */
 
 function drawSea(){
 
-  let hy=H*.37;
+  ctx.fillStyle="#2b9aa0";
 
-  let g=ctx.createLinearGradient(
-    0,hy,0,H
-  );
+  ctx.beginPath();
+  ctx.moveTo(0,horizon());
+  ctx.lineTo(W,horizon());
 
-  g.addColorStop(0,"#45b4d0");
-  g.addColorStop(1,"#207f9e");
+  for(let x=W;x>=0;x-=10){
 
-  ctx.fillStyle=g;
+    const wave=
+      Math.sin(x*.025+game.time*.00025)*3+
+      Math.sin(x*.008+game.time*.0001)*4;
 
-  ctx.fillRect(
-    0,
-    hy,
-    W,
-    H-hy
-  );
+    ctx.lineTo(x,horizon()+18+wave);
+  }
 
-  for(let i=0;i<18;i++){
+  ctx.closePath();
+  ctx.fill();
 
-    let y=
-      hy+14+i*14;
+  /* 海浪 */
+  ctx.globalAlpha=.28;
 
-    let offset=
-      Math.sin(
-        G.time*.0008+i
-      )*15;
+  for(let i=0;i<8;i++){
 
-    ctx.strokeStyle=
-      "rgba(255,255,255,.12)";
-
-    ctx.lineWidth=1.5;
+    const y=horizon()+25+i*17;
 
     ctx.beginPath();
 
-    for(
-      let x=-40;
-      x<W+40;
-      x+=40
-    ){
-
-      let yy=
-        y+
-        Math.sin(
-          x*.035+
-          i+
-          G.time*.001
-        )*2;
-
-      if(x===-40){
-        ctx.moveTo(x+offset,yy);
-      }else{
-        ctx.lineTo(x+offset,yy);
-      }
-
+    for(let x=0;x<W;x+=18){
+      ctx.lineTo(
+        x,
+        y+Math.sin(x*.04+game.time*.001+i)*3
+      );
     }
 
+    ctx.strokeStyle="#d9ffff";
+    ctx.lineWidth=1;
     ctx.stroke();
   }
+
+  ctx.globalAlpha=1;
 }
 
+/* =========================
+   远处岛屿
+========================= */
 
 function drawIsland(){
 
-  let hy=H*.37;
+  const y=horizon()+18;
 
-  ctx.fillStyle="#4d7467";
-
-  ctx.beginPath();
-
-  ctx.moveTo(0,hy+36);
-
-  for(
-    let x=0;
-    x<=W;
-    x+=22
-  ){
-
-    let y=
-      hy+
-      28+
-      Math.sin(x*.012)*14+
-      Math.sin(x*.039)*6;
-
-    ctx.lineTo(x,y);
-  }
-
-  ctx.lineTo(W,hy+115);
-  ctx.lineTo(0,hy+115);
-
-  ctx.fill();
-
-  /* 远处山 */
-
-  ctx.fillStyle="#3e655c";
+  ctx.fillStyle="#315f54";
 
   ctx.beginPath();
 
-  ctx.moveTo(W*.48,hy+45);
+  ctx.moveTo(0,y+8);
 
-  ctx.lineTo(W*.58,hy-10);
-  ctx.lineTo(W*.68,hy+45);
+  ctx.quadraticCurveTo(
+    W*.17,y-35,
+    W*.31,y+5
+  );
 
-  ctx.lineTo(W*.76,hy+10);
-  ctx.lineTo(W*.88,hy+50);
+  ctx.quadraticCurveTo(
+    W*.48,y-50,
+    W*.64,y+4
+  );
 
-  ctx.lineTo(W,hy+50);
+  ctx.quadraticCurveTo(
+    W*.83,y-32,
+    W,y+5
+  );
 
-  ctx.lineTo(W,hy+100);
-
-  ctx.lineTo(W*.48,hy+100);
+  ctx.lineTo(W,y+65);
+  ctx.lineTo(0,y+65);
 
   ctx.closePath();
-
   ctx.fill();
+
+  /* 远处树 */
+  for(let i=0;i<9;i++){
+
+    const x=(i+.5)*W/9;
+
+    const ty=y+rand(-25,5);
+
+    ctx.fillStyle="#244d44";
+    ctx.fillRect(x-3,ty,6,25);
+
+    ctx.beginPath();
+    ctx.arc(x,ty-8,18,0,Math.PI*2);
+    ctx.fill();
+  }
 }
 
-
-/* =====================================================
+/* =========================
    道路
-===================================================== */
+========================= */
 
 function drawRoad(){
 
-  let hy=H*.37;
-  let bottom=H*1.08;
+  const hy=horizon();
 
-  let topW=roadWidth(0);
-  let bottomW=roadWidth(1);
-
-  let tc=curveAt(0);
-  let bc=curveAt(1);
-
-  /* 道路阴影 */
-
-  ctx.fillStyle="rgba(22,46,40,.20)";
+  /* 草地 */
+  ctx.fillStyle="#5c9b65";
 
   ctx.beginPath();
-
-  ctx.moveTo(
-    W/2-topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2+topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2+bottomW/2+bc,
-    bottom
-  );
-
-  ctx.lineTo(
-    W/2-bottomW/2+bc,
-    bottom
-  );
-
+  ctx.moveTo(0,hy);
+  ctx.lineTo(W,hy);
+  ctx.lineTo(W,H);
+  ctx.lineTo(0,H);
   ctx.closePath();
   ctx.fill();
 
+  /* 道路主体 */
 
-  /* 路面 */
+  const farW=roadWidth(1);
+  const nearW=roadWidth(0);
 
-  let roadGrad=
-    ctx.createLinearGradient(
-      0,hy,0,bottom
-    );
+  ctx.beginPath();
 
-  roadGrad.addColorStop(0,"#cdb57f");
-  roadGrad.addColorStop(.5,"#b99a63");
-  roadGrad.addColorStop(1,"#9e7e4e");
+  ctx.moveTo(W/2-farW/2,hy);
+  ctx.lineTo(W/2+farW/2,hy);
+
+  ctx.lineTo(W/2+nearW/2,H);
+  ctx.lineTo(W/2-nearW/2,H);
+
+  ctx.closePath();
+
+  const roadGrad=ctx.createLinearGradient(
+    0,hy,0,H
+  );
+
+  roadGrad.addColorStop(0,"#687a78");
+  roadGrad.addColorStop(.5,"#52625f");
+  roadGrad.addColorStop(1,"#394744");
 
   ctx.fillStyle=roadGrad;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    W/2-topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2+topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2+bottomW/2+bc,
-    bottom
-  );
-
-  ctx.lineTo(
-    W/2-bottomW/2+bc,
-    bottom
-  );
-
-  ctx.closePath();
-
   ctx.fill();
-
-
-  /* 路面横向纹理 */
-
-  for(let i=0;i<34;i++){
-
-    let z1=i/34;
-    let z2=(i+1)/34;
-
-    let y1=roadY(z1);
-    let y2=roadY(z2);
-
-    let w1=roadWidth(z1);
-    let w2=roadWidth(z2);
-
-    ctx.fillStyle=
-      i%2===0
-      ?"rgba(255,255,255,.025)"
-      :"rgba(60,40,20,.035)";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      W/2-w1/2+curveAt(z1),
-      y1
-    );
-
-    ctx.lineTo(
-      W/2+w1/2+curveAt(z1),
-      y1
-    );
-
-    ctx.lineTo(
-      W/2+w2/2+curveAt(z2),
-      y2
-    );
-
-    ctx.lineTo(
-      W/2-w2/2+curveAt(z2),
-      y2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-  }
-
 
   /* 道路边缘 */
 
-  ctx.strokeStyle=
-    "rgba(245,224,165,.75)";
-
-  ctx.lineWidth=4;
+  ctx.strokeStyle="#e5d9a1";
+  ctx.lineWidth=5;
 
   ctx.beginPath();
-
-  ctx.moveTo(
-    W/2-topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2-bottomW/2+bc,
-    bottom
-  );
-
+  ctx.moveTo(W/2-farW/2,hy);
+  ctx.lineTo(W/2-nearW/2,H);
   ctx.stroke();
 
   ctx.beginPath();
-
-  ctx.moveTo(
-    W/2+topW/2+tc,
-    hy
-  );
-
-  ctx.lineTo(
-    W/2+bottomW/2+bc,
-    bottom
-  );
-
+  ctx.moveTo(W/2+farW/2,hy);
+  ctx.lineTo(W/2+nearW/2,H);
   ctx.stroke();
 
-
-  /* 三车道分隔线 */
+  /* 三条路线分隔 */
 
   for(let lane=0;lane<2;lane++){
 
-    let offset=
-      (lane-.5)*.47;
+    for(let i=0;i<18;i++){
 
-    ctx.strokeStyle=
-      "rgba(255,241,193,.55)";
+      const z=1-i/18;
 
-    ctx.lineWidth=2;
+      const z2=z-.035;
 
-    ctx.setLineDash([9,17]);
+      if(z2<0)continue;
 
-    ctx.beginPath();
+      const x1=
+        W/2+
+        (lane===0?-1:1)*roadWidth(z)*.145;
 
-    ctx.moveTo(
-      W/2+
-      offset*roadWidth(0)+
-      curveAt(0),
-      hy
-    );
+      const x2=
+        W/2+
+        (lane===0?-1:1)*roadWidth(z2)*.145;
 
-    ctx.lineTo(
-      W/2+
-      offset*roadWidth(1)+
-      curveAt(1),
-      bottom
-    );
+      const y1=roadY(z);
+      const y2=roadY(z2);
 
-    ctx.stroke();
+      ctx.strokeStyle="rgba(240,239,205,.55)";
+      ctx.lineWidth=Math.max(1,4*perspective(z));
 
-    ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+      ctx.stroke();
+    }
   }
 
+  /* 路面砖块 */
 
-  /* 路面小石子 */
+  for(let i=0;i<28;i++){
 
-  for(let i=0;i<32;i++){
+    const z=(i/28);
 
-    let z=
-      (i/32+
-      G.worldOffset*.0007+
-      i*.013)%1;
+    const y=roadY(z);
 
-    let y=roadY(z);
-    let w=roadWidth(z);
-    let c=curveAt(z);
+    const w=roadWidth(z);
 
-    let s=.15+z*1.3;
-
-    ctx.fillStyle=
-      i%3===0
-      ?"rgba(83,69,48,.30)"
-      :"rgba(245,220,165,.28)";
+    ctx.strokeStyle="rgba(255,255,255,.045)";
+    ctx.lineWidth=1;
 
     ctx.beginPath();
-
-    ctx.ellipse(
-      W/2+
-      ((i%2?-1:1)*w*.37)+c,
-      y,
-      3*s,
-      2*s,
-      0,
-      0,
-      Math.PI*2
-    );
-
-    ctx.fill();
+    ctx.moveTo(W/2-w/2,y);
+    ctx.lineTo(W/2+w/2,y);
+    ctx.stroke();
   }
 }
 
-
-/* =====================================================
-   海岛环境
-===================================================== */
+/* =========================
+   路边植物
+========================= */
 
 function drawPalm(x,y,s){
 
   ctx.save();
-
   ctx.translate(x,y);
   ctx.scale(s,s);
 
-  ctx.strokeStyle="#735035";
-  ctx.lineWidth=8;
+  ctx.strokeStyle="#704b2d";
+  ctx.lineWidth=6;
   ctx.lineCap="round";
 
   ctx.beginPath();
-
   ctx.moveTo(0,0);
-
   ctx.quadraticCurveTo(
-    -5,-45,
-    -2,-100
+    -5,-35,
+    4,-70
   );
-
   ctx.stroke();
 
-  ctx.fillStyle="#30945a";
+  ctx.fillStyle="#267449";
 
-  for(
-    let a=-1.3;
-    a<=1.3;
-    a+=.43
-  ){
+  for(let i=0;i<7;i++){
+
+    const a=
+      -1.4+i*.45+
+      Math.sin(game.time*.001+i)*.03;
 
     ctx.save();
-
     ctx.rotate(a);
 
     ctx.beginPath();
-
     ctx.ellipse(
-      0,-101,
-      10,
-      37,
-      0,
-      0,
-      Math.PI*2
+      0,-72,
+      8,32,
+      0,0,Math.PI*2
     );
-
     ctx.fill();
 
     ctx.restore();
@@ -997,1442 +566,597 @@ function drawPalm(x,y,s){
   ctx.restore();
 }
 
-
 function drawEnvironment(){
 
-  for(let i=0;i<11;i++){
+  for(let i=0;i<8;i++){
 
-    let z=
-      (i/11+
-      G.worldOffset*.0005)%1;
+    const z=(i+.5)/8;
 
-    let y=roadY(z);
-    let w=roadWidth(z);
-    let c=curveAt(z);
+    const y=roadY(z);
 
-    let s=.13+z*1.35;
+    const scale=.15+.7*perspective(z);
 
-    let side=
-      i%2===0?-1:1;
-
-    drawPalm(
-      W/2+
-      side*(w/2+34*s)+
-      c,
-      y+7,
-      s
-    );
-
-    /* 草丛 */
-
-    if(z>.2){
-
-      ctx.fillStyle="#477b4e";
-
-      let gx=
-        W/2+
-        side*(w/2+13*s)+
-        c;
-
-      ctx.beginPath();
-
-      for(let k=0;k<5;k++){
-
-        ctx.moveTo(
-          gx+k*4*side,
-          y
-        );
-
-        ctx.lineTo(
-          gx+(k*4+3)*side,
-          y-10*s
-        );
-      }
-
-      ctx.fill();
+    if(i%2===0){
+      drawPalm(
+        roadWidth(z)/2+W/2+20,
+        y,
+        scale
+      );
+    }else{
+      drawPalm(
+        W/2-roadWidth(z)/2-20,
+        y,
+        scale
+      );
     }
   }
 }
 
+/* =========================
+   老鼠
+========================= */
 
-/* =====================================================
+/*
+  这里才是重点：
+  老鼠本身有真实跑步动画。
+  身体会上下起伏，双腿交替，
+  尾巴摆动，耳朵也会轻微运动。
+*/
+
+function drawMouse(x,y,scale,mode="run"){
+
+  ctx.save();
+
+  ctx.translate(x,y);
+  ctx.scale(scale,scale);
+
+  let t=game.time*.012;
+
+  let running=mode==="run";
+
+  let step=running?
+    Math.sin(t)*11:
+    0;
+
+  let bounce=running?
+    Math.abs(Math.sin(t))*.035:
+    0;
+
+  ctx.translate(0,-bounce*100);
+
+  /* 阴影 */
+
+  ctx.save();
+
+  ctx.scale(1,.28);
+
+  ctx.beginPath();
+  ctx.ellipse(
+    0,8,
+    37,13,
+    0,0,Math.PI*2
+  );
+
+  ctx.fillStyle="rgba(0,0,0,.3)";
+  ctx.fill();
+
+  ctx.restore();
+
+  /* 尾巴 */
+
+  ctx.strokeStyle="#9d6950";
+  ctx.lineWidth=7;
+  ctx.lineCap="round";
+
+  ctx.beginPath();
+
+  ctx.moveTo(27,5);
+
+  ctx.bezierCurveTo(
+    62,-8,
+    68+Math.sin(t)*8,-35,
+    89, -17
+  );
+
+  ctx.stroke();
+
+  /* 后腿 */
+
+  ctx.strokeStyle="#734837";
+  ctx.lineWidth=9;
+
+  ctx.beginPath();
+  ctx.moveTo(-11,24);
+  ctx.lineTo(-18-step*.55,46);
+  ctx.lineTo(-4-step,56);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(10,24);
+  ctx.lineTo(17+step*.55,46);
+  ctx.lineTo(29+step,56);
+  ctx.stroke();
+
+  /* 身体 */
+
+  ctx.fillStyle="#a86c4e";
+
+  ctx.beginPath();
+  ctx.ellipse(
+    0,5,
+    33,39,
+    0,0,Math.PI*2
+  );
+
+  ctx.fill();
+
+  /* 肚子 */
+
+  ctx.fillStyle="#d99b76";
+
+  ctx.beginPath();
+  ctx.ellipse(
+    5,14,
+    20,25,
+    0,0,Math.PI*2
+  );
+
+  ctx.fill();
+
+  /* 头 */
+
+  ctx.fillStyle="#b87958";
+
+  ctx.beginPath();
+  ctx.ellipse(
+    -4,-35,
+    32,29,
+    0,0,Math.PI*2
+  );
+
+  ctx.fill();
+
+  /* 耳朵 */
+
+  ctx.fillStyle="#8d5844";
+
+  ctx.beginPath();
+  ctx.arc(-28,-57,15,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(20,-58,15,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle="#e5a38d";
+
+  ctx.beginPath();
+  ctx.arc(-28,-57,8,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(20,-58,8,0,Math.PI*2);
+  ctx.fill();
+
+  /* 眼睛 */
+
+  ctx.fillStyle="#171313";
+
+  ctx.beginPath();
+  ctx.arc(-14,-39,4,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(9,-39,4,0,Math.PI*2);
+  ctx.fill();
+
+  /* 鼻子 */
+
+  ctx.fillStyle="#321d1b";
+
+  ctx.beginPath();
+  ctx.arc(-2,-25,5,0,Math.PI*2);
+  ctx.fill();
+
+  /* 嘴 */
+
+  ctx.strokeStyle="#542c29";
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+  ctx.arc(-2,-23,9,.15,1.1);
+  ctx.stroke();
+
+  /* 前腿 */
+
+  ctx.strokeStyle="#744635";
+  ctx.lineWidth=8;
+
+  ctx.beginPath();
+  ctx.moveTo(-19,18);
+  ctx.lineTo(-28-step,42);
+  ctx.lineTo(-17-step,51);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(17,18);
+  ctx.lineTo(28+step,42);
+  ctx.lineTo(39+step,51);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/* =========================
    物体
-===================================================== */
+========================= */
 
-function spawn(type,lane,z){
+function spawn(type,lane,z=1.02){
 
-  G.objects.push({
+  game.objects.push({
     type,
     lane,
     z,
-    phase:Math.random()*Math.PI*2,
-    hit:false
+    collected:false,
+    rot:Math.random()*6.28
   });
 }
 
-
-/*
-  新版核心：
-
-  不再连续疯狂刷东西。
-
-  每次只生成一个“事件组”。
-
-  组与组之间必须有明显安全距离。
-*/
-
 function spawnPattern(){
 
-  let z=1.08;
+  const safe=Math.floor(Math.random()*3);
 
-  let d=G.distance;
+  const r=Math.random();
 
-  let r=Math.random();
+  /* 单个障碍 */
 
-  /*
-    0-100m：
-    几乎教学模式
-  */
-
-  if(d<100){
-
-    if(Math.random()<.55){
-
-      let lane=
-        Math.floor(Math.random()*3);
-
-      spawn("coin",lane,z);
-
-      spawn("coin",lane,z-.075);
-
-      spawn("coin",lane,z-.15);
-    }
-
-    return;
-  }
-
-
-  /*
-    100-250m：
-    单障碍
-  */
-
-  if(d<250){
-
-    if(r<.55){
-
-      let lane=
-        Math.floor(Math.random()*3);
-
-      spawn(
-        choose(["rock","log"]),
-        lane,
-        z
-      );
-
-    }else{
-
-      let lane=
-        Math.floor(Math.random()*3);
-
-      spawn("coin",lane,z);
-      spawn("coin",lane,z-.09);
-      spawn("coin",lane,z-.18);
-    }
-
-    return;
-  }
-
-
-  /*
-    250-500m：
-    单障碍 + 金币路线
-  */
-
-  if(d<500){
-
-    let lane=
-      Math.floor(Math.random()*3);
-
-    if(r<.58){
-
-      spawn(
-        choose([
-          "rock",
-          "log",
-          "barrier"
-        ]),
-        lane,
-        z
-      );
-
-      let safe=
-        (lane+1+
-        Math.floor(Math.random()*2))%3;
-
-      spawn("coin",safe,z-.15);
-      spawn("coin",safe,z-.24);
-      spawn("coin",safe,z-.33);
-
-    }else{
-
-      spawn("coin",lane,z);
-      spawn("coin",lane,z-.09);
-      spawn("coin",lane,z-.18);
-      spawn("coin",lane,z-.27);
-    }
-
-    return;
-  }
-
-
-  /*
-    500-800m：
-    开始有组合，但依然留安全路线
-  */
-
-  if(d<800){
-
-    let safe=
-      Math.floor(Math.random()*3);
-
-    if(r<.68){
-
-      for(let lane=0;lane<3;lane++){
-
-        if(lane!==safe){
-
-          spawn(
-            choose([
-              "rock",
-              "log",
-              "barrier"
-            ]),
-            lane,
-            z
-          );
-        }
-      }
-
-      spawn("coin",safe,z-.14);
-      spawn("coin",safe,z-.23);
-      spawn("coin",safe,z-.32);
-
-    }else{
-
-      spawn("boost",safe,z);
-
-      spawn("coin",safe,z-.12);
-      spawn("coin",safe,z-.22);
-      spawn("coin",safe,z-.32);
-    }
-
-    return;
-  }
-
-
-  /*
-    800m+：
-    难度提升，但不会满屏
-  */
-
-  let safe=
-    Math.floor(Math.random()*3);
-
-  if(r<.48){
-
-    for(let lane=0;lane<3;lane++){
-
-      if(lane!==safe){
-
-        spawn(
-          choose([
-            "rock",
-            "barrier",
-            "log"
-          ]),
-          lane,
-          z
-        );
-      }
-    }
-
-    spawn("coin",safe,z-.13);
-    spawn("coin",safe,z-.23);
-
-  }
-
-  else if(r<.68){
+  if(r<.24){
 
     spawn(
-      choose([
-        "magnet",
-        "shield"
-      ]),
-      safe,
-      z
+      choose(["rock","log","barrier"]),
+      choose([0,1,2]),
+      1.05
     );
 
-    spawn("coin",safe,z-.13);
-    spawn("coin",safe,z-.23);
-
   }
+
+  /* 双障碍 */
+
+  else if(r<.43){
+
+    const lanes=[0,1,2];
+
+    lanes.splice(safe,1);
+
+    spawn(
+      choose(["rock","log","barrier"]),
+      lanes[0],
+      1.05
+    );
+
+    spawn(
+      choose(["rock","log"]),
+      lanes[1],
+      1.18
+    );
+  }
+
+  /* 金币路线 */
+
+  else if(r<.63){
+
+    const lane=choose([0,1,2]);
+
+    for(let i=0;i<5;i++){
+
+      spawn(
+        "coin",
+        lane,
+        1.05+i*.08
+      );
+    }
+  }
+
+  /* 道具 */
 
   else if(r<.78){
 
-    spawn("chest",safe,z);
+    spawn(
+      choose(["boost","magnet","shield"]),
+      safe,
+      1.08
+    );
 
+    for(let i=0;i<4;i++){
+
+      spawn(
+        "coin",
+        safe,
+        1.22+i*.08
+      );
+    }
   }
+
+  /* 宝箱 */
 
   else{
 
-    spawn("coin",safe,z);
-    spawn("coin",safe,z-.1);
-    spawn("coin",safe,z-.2);
+    spawn("chest",safe,1.05);
+
+    for(let i=0;i<5;i++){
+
+      spawn(
+        "coin",
+        safe,
+        1.18+i*.07
+      );
+    }
   }
 }
 
-
-function updateSpawn(dt){
-
-  G.spawnTimer-=dt;
-
-  if(G.spawnTimer>0)return;
-
-  spawnPattern();
-
-  /*
-    这是这版非常重要的地方：
-
-    以前是不到一秒就刷一组。
-
-    现在根据距离逐渐缩短，
-    但前期故意留大量空白。
-  */
-
-  let interval;
-
-  if(G.distance<100){
-
-    interval=2.25;
-
-  }else if(G.distance<250){
-
-    interval=1.95;
-
-  }else if(G.distance<500){
-
-    interval=1.72;
-
-  }else if(G.distance<800){
-
-    interval=1.52;
-
-  }else{
-
-    interval=1.35;
-  }
-
-  G.spawnTimer=
-    interval+
-    rand(.15,.55);
-}
-
-
-/* =====================================================
+/* =========================
    物体绘制
-===================================================== */
+========================= */
 
 function drawObject(o){
 
-  if(o.z<0||o.z>1.12)return;
+  const p=perspective(o.z);
 
-  let x=laneX(o.lane,o.z);
-  let y=roadY(o.z);
+  const x=laneX(o.lane,o.z);
+  const y=roadY(o.z);
 
-  let s=.18+o.z*1.75;
+  const s=.18+.95*p;
 
   ctx.save();
 
   ctx.translate(x,y);
 
-
-  /* 金币 */
-
   if(o.type==="coin"){
 
-    let r=8+15*s;
-
-    let bob=
-      Math.sin(
-        G.time*.006+
-        o.phase
-      )*4*s;
-
-    ctx.translate(
-      0,
-      -32*s+bob
-    );
-
     ctx.rotate(
-      G.time*.003+
-      o.phase
+      Math.sin(game.time*.006+o.rot)*.35
     );
 
-    ctx.shadowBlur=12;
-    ctx.shadowColor="#ffd52f";
-
-    ctx.fillStyle="#ffd32f";
-    ctx.strokeStyle="#fff2a2";
-    ctx.lineWidth=2.5;
+    ctx.fillStyle="#ffd84a";
 
     ctx.beginPath();
-
     ctx.ellipse(
-      0,0,
-      r*.57,
-      r,
+      0,
+      -25*s,
+      13*s,
+      17*s,
       0,
       0,
       Math.PI*2
     );
-
     ctx.fill();
+
+    ctx.strokeStyle="#fff2a2";
+    ctx.lineWidth=3*s;
+
     ctx.stroke();
 
-    ctx.shadowBlur=0;
-
-    ctx.fillStyle="#fff3a0";
-
-    ctx.font=
-      `bold ${Math.max(9,r*.75)}px Arial`;
-
-    ctx.textAlign="center";
-
-    ctx.fillText(
-      "★",
-      0,
-      r*.3
-    );
   }
 
+  else if(o.type==="rock"){
 
-  /* 道具 */
-
-  else if(
-    o.type==="boost"||
-    o.type==="magnet"||
-    o.type==="shield"
-  ){
-
-    let r=14+22*s;
-
-    let bob=
-      Math.sin(
-        G.time*.005+
-        o.phase
-      )*5;
-
-    ctx.translate(
-      0,
-      -38*s+bob
-    );
-
-    let color;
-
-    if(o.type==="boost")
-      color="#ff9638";
-
-    else if(o.type==="magnet")
-      color="#9f79f4";
-
-    else
-      color="#4dd9e9";
-
-    ctx.shadowBlur=18;
-    ctx.shadowColor=color;
-
-    ctx.fillStyle=color;
+    ctx.fillStyle="#655c54";
 
     ctx.beginPath();
 
+    ctx.moveTo(-25*s,0);
+    ctx.lineTo(-18*s,-35*s);
+    ctx.lineTo(8*s,-43*s);
+    ctx.lineTo(28*s,-15*s);
+    ctx.lineTo(22*s,0);
+
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle="#81766b";
+
+    ctx.beginPath();
+    ctx.moveTo(-18*s,-35*s);
+    ctx.lineTo(8*s,-43*s);
+    ctx.lineTo(0,-28*s);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  else if(o.type==="log"){
+
+    ctx.fillStyle="#784b2f";
+
+    ctx.rotate(.05);
+
+    ctx.fillRect(
+      -32*s,
+      -27*s,
+      64*s,
+      25*s
+    );
+
+    ctx.fillStyle="#b67a4e";
+
+    ctx.beginPath();
     ctx.arc(
-      0,0,r,
+      31*s,
+      -15*s,
+      12*s,
       0,
       Math.PI*2
     );
-
     ctx.fill();
 
-    ctx.shadowBlur=0;
+  }
 
-    ctx.fillStyle="#fff";
+  else if(o.type==="barrier"){
 
-    ctx.font=
-      `bold ${Math.max(13,r*.82)}px Arial`;
+    ctx.fillStyle="#d35a42";
 
-    ctx.textAlign="center";
+    ctx.fillRect(
+      -32*s,
+      -34*s,
+      64*s,
+      28*s
+    );
 
-    ctx.fillText(
-      o.type==="boost"?"⚡":
-      o.type==="magnet"?"🧲":"◇",
-      0,
-      r*.34
+    ctx.fillStyle="#f4e4bd";
+
+    for(let i=-2;i<3;i++){
+
+      ctx.save();
+      ctx.translate(i*16*s,-20*s);
+      ctx.rotate(-.5);
+
+      ctx.fillRect(
+        -4*s,
+        -14*s,
+        8*s,
+        28*s
+      );
+
+      ctx.restore();
+    }
+  }
+
+  else if(o.type==="boost"){
+
+    drawPower(
+      "⚡",
+      "#ffca4a",
+      s
     );
   }
 
+  else if(o.type==="magnet"){
 
-  /* 宝箱 */
+    drawPower(
+      "🧲",
+      "#e85a7a",
+      s
+    );
+  }
+
+  else if(o.type==="shield"){
+
+    drawPower(
+      "🛡️",
+      "#58c8ff",
+      s
+    );
+  }
 
   else if(o.type==="chest"){
 
-    let w=31+43*s;
-    let h=22+28*s;
-
-    ctx.translate(
-      0,
-      -h
-    );
-
-    ctx.shadowBlur=13;
-    ctx.shadowColor="rgba(255,190,50,.65)";
-
-    ctx.fillStyle="#704529";
+    ctx.fillStyle="#a96532";
 
     ctx.fillRect(
-      -w/2,
-      0,
-      w,
-      h
+      -30*s,
+      -40*s,
+      60*s,
+      40*s
     );
 
-    ctx.fillStyle="#d9a936";
+    ctx.fillStyle="#ffd34c";
 
     ctx.fillRect(
-      -w*.07,
-      0,
-      w*.14,
-      h
+      -6*s,
+      -40*s,
+      12*s,
+      40*s
     );
-
-    ctx.fillStyle="#a96b36";
 
     ctx.beginPath();
 
     ctx.arc(
       0,
-      1,
-      w*.47,
+      -40*s,
+      30*s,
       Math.PI,
       Math.PI*2
     );
 
-    ctx.fill();
-
-    ctx.shadowBlur=0;
-
-    ctx.fillStyle="#ffe273";
-
-    ctx.fillRect(
-      -5,
-      -3,
-      10,
-      7
-    );
-  }
-
-
-  /* 障碍 */
-
-  else{
-
-    let w=25+54*s;
-    let h=25+53*s;
-
-    ctx.translate(
-      0,
-      -h*.42
-    );
-
-
-    /* 岩石 */
-
-    if(o.type==="rock"){
-
-      ctx.fillStyle="#65736e";
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        -w*.56,0
-      );
-
-      ctx.lineTo(
-        -w*.36,
-        -h*.72
-      );
-
-      ctx.lineTo(
-        0,
-        -h
-      );
-
-      ctx.lineTo(
-        w*.55,
-        -h*.40
-      );
-
-      ctx.lineTo(
-        w*.44,
-        0
-      );
-
-      ctx.closePath();
-
-      ctx.fill();
-
-      ctx.fillStyle="#8c9990";
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        -w*.36,
-        -h*.72
-      );
-
-      ctx.lineTo(
-        0,
-        -h
-      );
-
-      ctx.lineTo(
-        -w*.02,
-        -h*.36
-      );
-
-      ctx.lineTo(
-        -w*.25,
-        -h*.20
-      );
-
-      ctx.closePath();
-
-      ctx.fill();
-    }
-
-
-    /* 木头 */
-
-    else if(o.type==="log"){
-
-      ctx.fillStyle="#80502e";
-
-      ctx.fillRect(
-        -w*.58,
-        -h*.28,
-        w*1.16,
-        h*.58
-      );
-
-      ctx.fillStyle="#b7783e";
-
-      ctx.beginPath();
-
-      ctx.arc(
-        -w*.58,
-        0,
-        h*.25,
-        0,
-        Math.PI*2
-      );
-
-      ctx.fill();
-
-      ctx.strokeStyle="#714326";
-      ctx.lineWidth=2;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        -w*.58,
-        0,
-        h*.13,
-        0,
-        Math.PI*2
-      );
-
-      ctx.stroke();
-    }
-
-
-    /* 路障 */
-
-    else if(o.type==="barrier"){
-
-      ctx.fillStyle="#c96742";
-
-      ctx.fillRect(
-        -w*.58,
-        -h*.55,
-        w*1.16,
-        h*.65
-      );
-
-      ctx.fillStyle="#ffc15c";
-
-      ctx.fillRect(
-        -w*.45,
-        -h*.38,
-        w*.9,
-        h*.12
-      );
-
-      ctx.fillStyle="#744d37";
-
-      ctx.fillRect(
-        -w*.47,
-        h*.08,
-        w*.10,
-        h*.35
-      );
-
-      ctx.fillRect(
-        w*.37,
-        h*.08,
-        w*.10,
-        h*.35
-      );
-    }
-
-  }
-
-  ctx.restore();
-}
-
-
-/* =====================================================
-   臭臭鼠
-===================================================== */
-
-function drawMouse(){
-
-  let x=laneX(G.lane,.94);
-
-  let ground=
-    roadY(.94)-8;
-
-  let y=
-    ground-G.jump;
-
-  let run=
-    Math.sin(G.time*.018);
-
-  let sx=
-    1+
-    Math.abs(run)*.025;
-
-  let sy=
-    1-
-    Math.abs(run)*.018;
-
-  ctx.save();
-
-  ctx.translate(x,y);
-
-  ctx.scale(sx,sy);
-
-
-  /* 阴影 */
-
-  let shadow=
-    clamp(
-      1-G.jump/130,
-      .18,
-      1
-    );
-
-  ctx.fillStyle=
-    `rgba(20,45,35,${.24*shadow})`;
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    11,
-    34*shadow,
-    9*shadow,
-    0,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 尾巴 */
-
-  ctx.strokeStyle="#9c644d";
-  ctx.lineWidth=6;
-  ctx.lineCap="round";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -24,-15
-  );
-
-  ctx.quadraticCurveTo(
-    -55,
-    -4,
-    -47,
-    17+run*4
-  );
-
-  ctx.stroke();
-
-
-  /* 身体 */
-
-  ctx.fillStyle="#a7745d";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    -20,
-    27,
-    34,
-    0,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 肚子 */
-
-  ctx.fillStyle="#d7a079";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    4,
-    -15,
-    15,
-    23,
-    0,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 腿 */
-
-  ctx.strokeStyle="#815440";
-  ctx.lineWidth=6;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -12,4
-  );
-
-  ctx.lineTo(
-    -16+run*6,
-    16
-  );
-
-  ctx.moveTo(
-    12,4
-  );
-
-  ctx.lineTo(
-    16-run*6,
-    16
-  );
-
-  ctx.stroke();
-
-
-  /* 耳朵 */
-
-  ctx.fillStyle="#b87961";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -17,-52,
-    13,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    17,-52,
-    13,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-  ctx.fillStyle="#e9aaa0";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -17,-52,
-    7,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    17,-52,
-    7,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 头 */
-
-  ctx.fillStyle="#b77d61";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    -52,
-    27,
-    24,
-    0,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 眼睛 */
-
-  ctx.fillStyle="#1c2021";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -9,-56,
-    3.6,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    9,-56,
-    3.6,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 鼻子 */
-
-  ctx.fillStyle="#4c3030";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,-46,
-    4,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 嘴 */
-
-  ctx.strokeStyle="#5b3530";
-  ctx.lineWidth=2;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    -43,
-    7,
-    .15,
-    Math.PI-.15
-  );
-
-  ctx.stroke();
-
-
-  /* 手 */
-
-  ctx.strokeStyle="#8d5c49";
-  ctx.lineWidth=5;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -21,-27
-  );
-
-  ctx.lineTo(
-    -29+run*3,
-    -17
-  );
-
-  ctx.moveTo(
-    21,-27
-  );
-
-  ctx.lineTo(
-    29-run*3,
-    -17
-  );
-
-  ctx.stroke();
-
-
-  /* 护盾 */
-
-  if(G.shield>0){
-
-    ctx.strokeStyle=
-      "rgba(75,222,255,.85)";
-
-    ctx.lineWidth=4;
-
-    ctx.fillStyle=
-      "rgba(75,222,255,.12)";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      0,
-      -30,
-      53+
-      Math.sin(G.time*.01)*4,
-      0,
-      Math.PI*2
-    );
-
-    ctx.fill();
-
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-
-/* =====================================================
-   开场专用臭臭鼠
-   不再调用正常跑步位置
-===================================================== */
-
-function drawIntroMouse(t){
-
-  let progress=
-    clamp(t/1.0,0,1);
-
-  let x;
-
-  if(t<1){
-
-    /* 从画面左侧走出来 */
-
-    x=
-      lerp(
-        -90,
-        W/2,
-        progress
-      );
-
-  }else{
-
-    x=W/2;
-  }
-
-  let ground=
-    roadY(.94)-8;
-
-  let y=ground;
-
-  let wave=0;
-
-  if(t>=1&&t<2.35){
-
-    wave=
-      Math.sin(
-        (t-1)*8
-      );
-  }
-
-  let turn=0;
-
-  if(t>=2.35){
-
-    turn=
-      clamp(
-        (t-2.35)/.75,
-        0,
-        1
-      );
-  }
-
-  ctx.save();
-
-  ctx.translate(x,y);
-
-  /* 先画身体 */
-
-  let run=
-    Math.sin(G.time*.015);
-
-  let scale=
-    1.05;
-
-  ctx.scale(
-    scale,
-    scale
-  );
-
-  /*
-    开场挥手：
-    正常鼠鼠基础身体
-  */
-
-  ctx.save();
-
-  /* 身体 */
-
-  ctx.fillStyle="#a7745d";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,-20,
-    27,34,
-    0,0,Math.PI*2
-  );
-
-  ctx.fill();
-
-  /* 肚子 */
-
-  ctx.fillStyle="#d7a079";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    4,-15,
-    15,23,
-    0,0,Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 耳朵 */
-
-  ctx.fillStyle="#b87961";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -17,-52,
-    13,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    17,-52,
-    13,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 头 */
-
-  ctx.fillStyle="#b77d61";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,-52,
-    27,24,
-    0,0,Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 内耳 */
-
-  ctx.fillStyle="#e9aaa0";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -17,-52,
-    7,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    17,-52,
-    7,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 眼睛 */
-
-  ctx.fillStyle="#1b2021";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -9,-56,
-    3.5,
-    0,
-    Math.PI*2
-  );
-
-  ctx.arc(
-    9,-56,
-    3.5,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 鼻子 */
-
-  ctx.fillStyle="#4c3030";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,-46,
-    4,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  /* 左手 */
-
-  ctx.strokeStyle="#8d5c49";
-  ctx.lineWidth=5;
-  ctx.lineCap="round";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -21,-27
-  );
-
-  ctx.lineTo(
-    -29,
-    -18
-  );
-
-  ctx.stroke();
-
-
-  /* 右手挥手 */
-
-  ctx.save();
-
-  ctx.translate(
-    21,
-    -27
-  );
-
-  ctx.rotate(
-    -0.35+
-    wave*.5
-  );
-
-  ctx.beginPath();
-
-  ctx.moveTo(0,0);
-
-  ctx.lineTo(
-    9,
-    -25
-  );
-
-  ctx.stroke();
-
-  /* 手掌 */
-
-  ctx.fillStyle="#a7745d";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    10,
-    -28,
-    7,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-  ctx.restore();
-
-
-  /* 嘴 */
-
-  ctx.strokeStyle="#5b3530";
-  ctx.lineWidth=2;
-
-  ctx.beginPath();
-
-  if(t>=1&&t<2.35){
-
-    /* 说话状态 */
-
-    ctx.ellipse(
-      0,
-      -43,
-      5,
-      4+
-      Math.abs(
-        Math.sin(t*15)
-      )*3,
-      0,
-      0,
-      Math.PI*2
-    );
-
-  }else{
-
-    ctx.arc(
-      0,
-      -43,
-      7,
-      .15,
-      Math.PI-.15
-    );
-  }
-
-  ctx.stroke();
-
-  ctx.restore();
-
-  /*
-    转身效果：
-    后半段缩窄，模拟转身
-  */
-
-  if(turn>0){
-
-    ctx.fillStyle=
-      "rgba(100,65,50,.16)";
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-      0,
-      -28,
-      28*(1-turn*.7),
-      40,
-      0,
-      0,
-      Math.PI*2
-    );
-
+    ctx.fillStyle="#c27b3b";
     ctx.fill();
   }
 
   ctx.restore();
 }
 
+function drawPower(icon,color,s){
 
-/* =====================================================
+  ctx.shadowColor=color;
+  ctx.shadowBlur=20*s;
+
+  ctx.fillStyle="rgba(255,255,255,.18)";
+
+  ctx.beginPath();
+  ctx.arc(
+    0,
+    -25*s,
+    27*s,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.shadowBlur=0;
+
+  ctx.font=`${34*s}px sans-serif`;
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.fillText(
+    icon,
+    0,
+    -25*s
+  );
+}
+
+/* =========================
    粒子
-===================================================== */
+========================= */
 
 function particle(x,y,color){
 
-  G.particles.push({
-
-    x,
-    y,
-
-    vx:rand(-2.4,2.4),
-
+  game.particles.push({
+    x,y,
+    vx:rand(-2,2),
     vy:rand(-4,-1),
-
     life:1,
-
     color
   });
 }
 
-
 function updateParticles(dt){
 
-  for(
-    let i=G.particles.length-1;
-    i>=0;
-    i--
-  ){
+  for(let i=game.particles.length-1;i>=0;i--){
 
-    let p=G.particles[i];
+    const p=game.particles[i];
 
     p.x+=p.vx;
     p.y+=p.vy;
 
-    p.vy+=.12;
+    p.vy+=.15;
 
     p.life-=dt*2;
 
     if(p.life<=0){
-
-      G.particles.splice(i,1);
+      game.particles.splice(i,1);
     }
   }
 }
 
-
 function drawParticles(){
 
-  for(const p of G.particles){
+  for(const p of game.particles){
 
     ctx.globalAlpha=p.life;
-
     ctx.fillStyle=p.color;
 
     ctx.beginPath();
-
     ctx.arc(
       p.x,
       p.y,
@@ -2447,685 +1171,452 @@ function drawParticles(){
   ctx.globalAlpha=1;
 }
 
-
-/* =====================================================
-   收集
-===================================================== */
-
-function collect(o){
-
-  if(o.hit)return;
-
-  o.hit=true;
-
-
-  if(o.type==="coin"){
-
-    G.coins++;
-
-    for(let i=0;i<5;i++){
-
-      particle(
-        laneX(o.lane,o.z),
-        roadY(o.z)-30,
-        "#ffe15b"
-      );
-    }
-  }
-
-
-  else if(o.type==="boost"){
-
-    G.boost=5;
-
-    showToast("⚡ 加速！");
-  }
-
-
-  else if(o.type==="magnet"){
-
-    G.magnet=7;
-
-    showToast("🧲 磁铁！");
-  }
-
-
-  else if(o.type==="shield"){
-
-    G.shield=8;
-
-    showToast("🛡 护盾！");
-  }
-
-
-  else if(o.type==="chest"){
-
-    G.coins+=5;
-
-    showToast("🎁 +5金币");
-
-    for(let i=0;i<15;i++){
-
-      particle(
-        laneX(o.lane,o.z),
-        roadY(o.z)-35,
-        "#ffd84a"
-      );
-    }
-  }
-}
-
-
-/* =====================================================
-   碰撞
-===================================================== */
-
-function checkObjects(){
-
-  for(const o of G.objects){
-
-    if(o.hit)continue;
-
-    /*
-      只有进入玩家附近区域才判断。
-    */
-
-    if(o.z<.88)continue;
-
-    if(o.z>1.01)continue;
-
-
-    /* 金币 */
-
-    if(o.type==="coin"){
-
-      if(G.magnet>0){
-
-        if(
-          Math.abs(
-            G.lane-o.lane
-          )<=1
-        ){
-
-          collect(o);
-        }
-
-      }else if(
-        G.lane===o.lane
-      ){
-
-        collect(o);
-      }
-
-      continue;
-    }
-
-
-    /* 道具 */
-
-    if(
-      o.type==="boost"||
-      o.type==="magnet"||
-      o.type==="shield"||
-      o.type==="chest"
-    ){
-
-      if(
-        G.lane===o.lane
-      ){
-
-        collect(o);
-      }
-
-      continue;
-    }
-
-
-    /* 障碍 */
-
-    if(
-      G.lane===o.lane
-    ){
-
-      /*
-        跳起来可以躲开
-      */
-
-      if(G.jump>35){
-
-        continue;
-      }
-
-
-      if(G.shield>0){
-
-        G.shield=0;
-
-        o.hit=true;
-
-        for(let i=0;i<14;i++){
-
-          particle(
-            laneX(o.lane,o.z),
-            roadY(o.z)-25,
-            "#6de8ff"
-          );
-        }
-
-        showToast("🛡 挡住了！");
-
-      }else{
-
-        gameOver();
-
-        return;
-      }
-    }
-  }
-}
-
-
-/* =====================================================
-   开场
-===================================================== */
-
-function introUpdate(dt){
-
-  G.introTime+=dt;
-
-  $("skip").style.display="block";
-
-  let t=G.introTime;
-
-
-  if(t<1){
-
-    $("introText").style.opacity=0;
-  }
-
-  else if(t<2.35){
-
-    $("introText").style.opacity=1;
-  }
-
-  else if(t<3.1){
-
-    $("introText").style.opacity=0;
-  }
-
-
-  /*
-    4秒后正式进入跑酷
-  */
-
-  if(t>=4){
-
-    $("skip").style.display="none";
-
-    $("introText").style.opacity=0;
-
-    G.mode="run";
-  }
-}
-
-
-$("skip").onclick=()=>{
-
-  G.mode="run";
-
-  $("skip").style.display="none";
-
-  $("introText").style.opacity=0;
-};
-
-
-/* =====================================================
+/* =========================
    开始
-===================================================== */
+========================= */
 
 function startGame(){
 
-  G.mode="intro";
+  game.state="intro";
 
-  G.time=0;
+  game.distance=0;
+  game.coins=0;
 
-  G.last=performance.now();
+  game.lane=1;
+  game.targetLane=1;
 
-  G.distance=0;
+  game.jumpY=0;
+  game.jumpV=0;
 
-  G.coins=0;
+  game.speed=.075;
 
-  G.lane=1;
+  game.objects=[];
+  game.particles=[];
 
-  G.targetLane=1;
+  game.spawnTimer=.8;
 
-  G.jump=0;
+  game.introTime=0;
 
-  G.jumpVelocity=0;
+  $("start").style.display="none";
+  $("over").style.display="none";
 
-  /*
-    初始速度故意慢
-  */
-
-  G.speed=.055;
-
-  G.objects=[];
-
-  G.particles=[];
-
-  G.spawnTimer=2.2;
-
-  G.shield=0;
-  G.magnet=0;
-  G.boost=0;
-
-  G.shake=0;
-
-  G.introTime=0;
-
-  G.worldOffset=0;
-
-  $("startScreen")
-    .classList
-    .add("hidden");
-
-  $("gameOver")
-    .classList
-    .add("hidden");
-
-  $("hint").style.opacity=0;
+  $("intro").style.opacity=0;
 }
 
+/* =========================
+   正式进入跑步
+========================= */
 
-$("startBtn").onclick=startGame;
+function beginRun(){
 
-$("restartBtn").onclick=startGame;
+  game.state="run";
 
+  $("intro").style.opacity=0;
+}
 
-/* =====================================================
-   死亡
-===================================================== */
+/* =========================
+   游戏结束
+========================= */
 
 function gameOver(){
 
-  if(
-    G.mode==="gameover"
-  )return;
+  if(game.state==="over")return;
 
-  G.mode="gameover";
+  game.state="over";
 
-  G.shake=.45;
+  game.best=Math.max(
+    game.best,
+    Math.floor(game.distance)
+  );
 
-  let d=
-    Math.floor(G.distance);
+  localStorage.setItem(
+    "chouchoushuBest",
+    game.best
+  );
 
-  if(d>G.best){
+  $("finalDistance").textContent=
+    Math.floor(game.distance);
 
-    G.best=d;
+  $("finalCoins").textContent=
+    game.coins;
 
-    localStorage.setItem(
-      "chouchou_best",
-      G.best
-    );
+  $("over").style.display="flex";
+}
+
+/* =========================
+   开场动画
+========================= */
+
+function updateIntro(dt){
+
+  game.introTime+=dt;
+
+  const t=game.introTime;
+
+  const intro=$("intro");
+
+  if(t<.7){
+
+    intro.style.opacity=
+      clamp(t/.7,0,1);
+
+  }
+  else if(t<2.5){
+
+    intro.style.opacity=1;
+
+  }
+  else if(t<3.2){
+
+    intro.style.opacity=
+      1-(t-2.5)/.7;
+
   }
 
-  $("finalDistance")
-    .textContent=d+"m";
+  if(t>=3.4){
 
-  $("finalCoins")
-    .textContent=G.coins;
+    beginRun();
 
-  $("bestDistance")
-    .textContent=G.best;
-
-  $("gameOver")
-    .classList
-    .remove("hidden");
-
-  for(let i=0;i<25;i++){
-
-    particle(
-      W/2,
-      H*.68,
-      "#ffffff"
-    );
   }
 }
 
-
-/* =====================================================
-   HUD
-===================================================== */
-
-function updateHUD(){
-
-  $("distance")
-    .textContent=
-    Math.floor(G.distance);
-
-  $("coins")
-    .textContent=
-    G.coins;
-
-  $("bestDistance")
-    .textContent=
-    G.best;
-
-  let status="正常";
-
-  if(G.boost>0)
-    status="⚡ 加速";
-
-  else if(G.magnet>0)
-    status="🧲 磁铁";
-
-  else if(G.shield>0)
-    status="🛡 护盾";
-
-  $("status")
-    .textContent=status;
-
-  let power=
-    Math.max(
-      G.boost,
-      G.magnet,
-      G.shield
-    );
-
-  $("powerFill")
-    .style
-    .width=
-    Math.min(
-      power/8*100,
-      100
-    )+"%";
-}
-
-
-/* =====================================================
-   游戏更新
-===================================================== */
+/* =========================
+   更新游戏
+========================= */
 
 function update(dt){
 
-  G.time+=dt*1000;
+  if(game.state==="intro"){
 
-  /*
-    开场
-  */
-
-  if(G.mode==="intro"){
-
-    introUpdate(dt);
-
+    updateIntro(dt);
     return;
   }
 
-
-  if(G.mode!=="run"){
-
+  if(game.state!=="run"){
     return;
   }
 
-
   /*
-    难度曲线
-
-    0-100：很慢
-    100-300：慢慢增加
-    300-600：正常
-    600-1000：偏快
-    1000+：挑战
+    距离真正持续增加。
+    老鼠的位置固定在玩家附近，
+    但道路和物体根据 z 不断向玩家移动。
   */
 
-  let d=G.distance;
+  let speed=game.speed;
 
-  let baseSpeed;
+  /* 速度成长 */
 
-  if(d<100){
+  if(game.distance<100){
 
-    baseSpeed=
-      lerp(
-        .055,
-        .065,
-        d/100
-      );
+    speed=.060;
 
-  }else if(d<300){
+  }else if(game.distance<300){
 
-    baseSpeed=
-      lerp(
-        .065,
-        .078,
-        (d-100)/200
-      );
+    speed=.072;
 
-  }else if(d<600){
+  }else if(game.distance<600){
 
-    baseSpeed=
-      lerp(
-        .078,
-        .092,
-        (d-300)/300
-      );
+    speed=.084;
 
-  }else if(d<1000){
+  }else if(game.distance<1000){
 
-    baseSpeed=
-      lerp(
-        .092,
-        .108,
-        (d-600)/400
-      );
+    speed=.098;
 
   }else{
 
-    baseSpeed=
-      Math.min(
-        .12,
-        .108+
-        (d-1000)*.000015
+    speed=.112;
+
+  }
+
+  game.speed=lerp(
+    game.speed,
+    speed,
+    dt*2
+  );
+
+  game.distance+=game.speed*dt*60;
+
+  /* 左右换道 */
+
+  game.lane=lerp(
+    game.lane,
+    game.targetLane,
+    dt*12
+  );
+
+  /* 跳跃 */
+
+  if(game.jumpY>0 || game.jumpV>0){
+
+    game.jumpV-=.65*dt*60;
+
+    game.jumpY+=game.jumpV*dt*60;
+
+    if(game.jumpY<=0){
+
+      game.jumpY=0;
+      game.jumpV=0;
+    }
+  }
+
+  /* 生成 */
+
+  game.spawnTimer-=dt;
+
+  if(game.spawnTimer<=0){
+
+    spawnPattern();
+
+    game.spawnTimer=
+      Math.max(
+        .62,
+        1.15-game.speed*3
       );
   }
 
-  G.speed=baseSpeed;
+  /* 物体向玩家移动 */
 
+  for(let i=game.objects.length-1;i>=0;i--){
 
-  /*
-    加速
-  */
-
-  if(G.boost>0){
-
-    G.speed+=.035;
-
-    G.boost-=dt;
-
-    if(G.boost<0)
-      G.boost=0;
-  }
-
-
-  /*
-    距离
-  */
-
-  G.distance+=
-    G.speed*
-    dt*
-    60;
-
-
-  G.worldOffset+=
-    G.speed*
-    dt*
-    60;
-
-
-  /*
-    换道
-  */
-
-  G.lane=
-    lerp(
-      G.lane,
-      G.targetLane,
-      clamp(dt*10,0,1)
-    );
-
-
-  /*
-    跳跃
-  */
-
-  if(
-    G.jump>0||
-    G.jumpVelocity>0
-  ){
-
-    G.jump+=
-      G.jumpVelocity*
-      dt*
-      60;
-
-    G.jumpVelocity-=
-      .62*
-      dt*
-      60;
-
-    if(G.jump<=0){
-
-      G.jump=0;
-
-      G.jumpVelocity=0;
-
-      for(let i=0;i<6;i++){
-
-        particle(
-          laneX(G.lane,.94),
-          roadY(.94)-5,
-          "#d6c099"
-        );
-      }
-    }
-  }
-
-
-  /*
-    道具时间
-  */
-
-  if(G.magnet>0){
-
-    G.magnet-=dt;
-
-    if(G.magnet<0)
-      G.magnet=0;
-  }
-
-  if(G.shield>0){
-
-    G.shield-=dt;
-
-    if(G.shield<0)
-      G.shield=0;
-  }
-
-
-  /*
-    生成
-  */
-
-  updateSpawn(dt);
-
-
-  /*
-    世界向玩家移动
-  */
-
-  for(const o of G.objects){
+    const o=game.objects[i];
 
     /*
-      这里故意不要太快。
+      z越小代表越靠近玩家
     */
 
-    o.z-=
-      G.speed*
-      dt*
-      .63;
-  }
+    o.z-=game.speed*dt*1.35;
 
+    const x=laneX(o.lane,o.z);
+    const y=roadY(o.z);
 
-  /*
-    磁铁
-  */
+    /*
+      收集金币 / 道具
+    */
 
-  if(G.magnet>0){
+    if(
+      !o.collected &&
+      o.z<.115 &&
+      o.z>-.08 &&
+      Math.abs(
+        o.lane-game.lane
+      )<.32
+    ){
 
-    for(const o of G.objects){
+      if(o.type==="coin"){
 
-      if(
-        o.type==="coin"&&
-        !o.hit&&
-        o.z>.60&&
-        Math.abs(
-          o.lane-G.lane
-        )<=1
+        o.collected=true;
+        game.coins++;
+
+        for(let k=0;k<6;k++){
+
+          particle(
+            x,
+            y-20,
+            "#ffe05b"
+          );
+        }
+      }
+
+      else if(
+        ["boost","magnet","shield","chest"]
+        .includes(o.type)
       ){
 
-        collect(o);
+        o.collected=true;
+
+        for(let k=0;k<10;k++){
+
+          particle(
+            x,
+            y-20,
+            "#8eeeff"
+          );
+        }
+      }
+
+      else if(
+        ["rock","log","barrier"]
+        .includes(o.type)
+      ){
+
+        /*
+          跳跃状态下可以躲过
+        */
+
+        if(game.jumpY<25){
+
+          game.shake=12;
+          gameOver();
+
+        }
       }
     }
+
+    if(o.z<-.18){
+
+      game.objects.splice(i,1);
+    }
   }
-
-
-  checkObjects();
-
-
-  /*
-    清理
-  */
-
-  G.objects=
-    G.objects.filter(
-      o=>
-      o.z>-.12&&!o.hit
-    );
-
 
   updateParticles(dt);
 
+  if(game.shake>0){
 
-  if(G.shake>0){
+    game.shake-=dt*30;
 
-    G.shake-=dt;
+    if(game.shake<0)
+      game.shake=0;
   }
 
+  $("distance").textContent=
+    Math.floor(game.distance);
 
-  updateHUD();
+  $("coins").textContent=
+    game.coins;
+}
 
+/* =========================
+   绘制
+========================= */
+
+function draw(){
+
+  ctx.clearRect(0,0,W,H);
+
+  ctx.save();
+
+  if(game.shake>0){
+
+    ctx.translate(
+      rand(-game.shake,game.shake),
+      rand(-game.shake,game.shake)
+    );
+  }
+
+  drawSky();
+  drawSea();
+  drawIsland();
+  drawEnvironment();
+  drawRoad();
 
   /*
-    100m提示一次
+    按远近绘制物体，
+    越远越先画。
+  */
+
+  const sorted=
+    [...game.objects]
+    .sort((a,b)=>b.z-a.z);
+
+  for(const o of sorted){
+
+    if(o.z>0){
+
+      drawObject(o);
+    }
+  }
+
+  /*
+    老鼠始终处在玩家位置。
+    它自身不断跑步，
+    而道路/障碍向后移动。
   */
 
   if(
-    G.distance>8&&
-    G.distance<10
+    game.state==="run" ||
+    game.state==="intro"
   ){
 
-    $("hint").style.opacity=.8;
+    let mouseX;
+    let mouseY;
 
-    setTimeout(()=>{
-      $("hint").style.opacity=0;
-    },1800);
+    if(game.state==="intro"){
+
+      const t=game.introTime;
+
+      /*
+        开场：
+        先从远处跑过来，
+        然后停下来挥手。
+      */
+
+      const p=
+        clamp(t/1.2,0,1);
+
+      mouseX=
+        W/2;
+
+      mouseY=
+        lerp(
+          H*.72,
+          H*.67,
+          p
+        );
+
+      let s=
+        lerp(.35,.9,p);
+
+      drawMouse(
+        mouseX,
+        mouseY,
+        s,
+        t<1.25?"run":"idle"
+      );
+
+    }else{
+
+      mouseX=
+        laneX(
+          game.lane,
+          .045
+        );
+
+      mouseY=
+        roadY(.045)-game.jumpY;
+
+      drawMouse(
+        mouseX,
+        mouseY,
+        .82,
+        "run"
+      );
+    }
   }
+
+  drawParticles();
+
+  ctx.restore();
 }
 
+/* =========================
+   主循环
+========================= */
 
-/* =====================================================
-   操作
-===================================================== */
+let last=performance.now();
+
+function loop(now){
+
+  let dt=
+    Math.min(
+      .033,
+      (now-last)/1000
+    );
+
+  last=now;
+
+  game.time+=dt*1000;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+
+/* =========================
+   手机触摸控制
+========================= */
 
 let touchX=0;
 let touchY=0;
@@ -3134,49 +1625,29 @@ canvas.addEventListener(
   "touchstart",
   e=>{
 
-    if(!e.touches.length)return;
+    const t=e.touches[0];
 
-    touchX=
-      e.touches[0].clientX;
-
-    touchY=
-      e.touches[0].clientY;
+    touchX=t.clientX;
+    touchY=t.clientY;
 
   },
   {passive:true}
 );
 
-
 canvas.addEventListener(
   "touchend",
   e=>{
 
-    if(G.mode!=="run")return;
-
-    if(!e.changedTouches.length)
+    if(game.state!=="run")
       return;
 
-    let x=
-      e.changedTouches[0].clientX;
+    const t=e.changedTouches[0];
 
-    let y=
-      e.changedTouches[0].clientY;
-
-    let dx=x-touchX;
-    let dy=y-touchY;
-
-
-    if(
-      Math.abs(dx)<30&&
-      Math.abs(dy)<30
-    ){
-
-      return;
-    }
-
+    const dx=t.clientX-touchX;
+    const dy=t.clientY-touchY;
 
     /*
-      左右
+      横向滑动
     */
 
     if(
@@ -3184,44 +1655,41 @@ canvas.addEventListener(
       Math.abs(dy)
     ){
 
-      if(dx>0){
+      if(Math.abs(dx)>25){
 
-        G.targetLane=
-          clamp(
-            G.targetLane+1,
-            0,2
-          );
+        if(dx>0){
 
-      }else{
+          game.targetLane=
+            Math.min(
+              2,
+              game.targetLane+1
+            );
 
-        G.targetLane=
-          clamp(
-            G.targetLane-1,
-            0,2
-          );
+        }else{
+
+          game.targetLane=
+            Math.max(
+              0,
+              game.targetLane-1
+            );
+        }
       }
 
     }
 
-
     /*
-      上下
+      上滑跳跃
     */
 
     else{
 
-      if(dy<0){
+      if(
+        dy<-35 &&
+        game.jumpY<=0
+      ){
 
-        if(G.jump===0){
-
-          G.jump=1;
-
-          G.jumpVelocity=2.65;
-        }
-
-      }else{
-
-        G.jumpVelocity-=1.5;
+        game.jumpV=12;
+        game.jumpY=1;
       }
     }
 
@@ -3229,196 +1697,66 @@ canvas.addEventListener(
   {passive:true}
 );
 
-
-/* 键盘 */
+/* =========================
+   键盘
+========================= */
 
 addEventListener(
   "keydown",
   e=>{
 
-    if(e.key==="ArrowLeft"){
-
-      G.targetLane=
-        clamp(
-          G.targetLane-1,
-          0,2
-        );
-    }
-
-
-    if(e.key==="ArrowRight"){
-
-      G.targetLane=
-        clamp(
-          G.targetLane+1,
-          0,2
-        );
-    }
-
+    if(game.state!=="run")
+      return;
 
     if(
-      e.key==="ArrowUp"||
+      e.key==="ArrowLeft" ||
+      e.key==="a"
+    ){
+
+      game.targetLane=
+        Math.max(
+          0,
+          game.targetLane-1
+        );
+    }
+
+    if(
+      e.key==="ArrowRight" ||
+      e.key==="d"
+    ){
+
+      game.targetLane=
+        Math.min(
+          2,
+          game.targetLane+1
+        );
+    }
+
+    if(
+      e.key==="ArrowUp" ||
+      e.key==="w" ||
       e.key===" "
     ){
 
-      if(G.jump===0){
+      if(game.jumpY<=0){
 
-        G.jump=1;
-
-        G.jumpVelocity=2.65;
+        game.jumpV=12;
+        game.jumpY=1;
       }
     }
 
-
-    if(e.key==="ArrowDown"){
-
-      G.jumpVelocity-=1.5;
-    }
   }
 );
 
+/* =========================
+   按钮
+========================= */
 
-/* =====================================================
-   Toast
-===================================================== */
+$("startBtn").onclick=
+  startGame;
 
-let toastTimer=0;
-
-function showToast(text){
-
-  $("toast")
-    .textContent=text;
-
-  $("toast")
-    .style
-    .opacity=1;
-
-  toastTimer=1;
-}
-
-
-/* =====================================================
-   绘制
-===================================================== */
-
-function draw(){
-
-  ctx.save();
-
-
-  /*
-    死亡震动
-  */
-
-  if(G.shake>0){
-
-    ctx.translate(
-      rand(-5,5),
-      rand(-5,5)
-    );
-  }
-
-
-  drawSky();
-
-  drawSea();
-
-  drawIsland();
-
-  drawRoad();
-
-  drawEnvironment();
-
-
-  /*
-    远处 → 近处
-  */
-
-  let arr=
-    [...G.objects]
-    .sort(
-      (a,b)=>
-      a.z-b.z
-    );
-
-
-  for(const o of arr){
-
-    drawObject(o);
-  }
-
-
-  /*
-    正常游戏角色
-  */
-
-  if(G.mode!=="intro"){
-
-    drawMouse();
-  }
-
-
-  drawParticles();
-
-  ctx.restore();
-
-
-  /*
-    开场动画独立绘制
-  */
-
-  if(G.mode==="intro"){
-
-    let t=G.introTime;
-
-    drawIntroMouse(t);
-
-    /*
-      对话文字
-    */
-
-    if(t>=1&&t<2.35){
-
-      $("introText")
-        .style
-        .opacity=1;
-
-    }else{
-
-      $("introText")
-        .style
-        .opacity=0;
-    }
-  }
-}
-
-
-/* =====================================================
-   主循环
-===================================================== */
-
-function loop(now){
-
-  let dt=
-    Math.min(
-      (now-G.last)/1000,
-      .033
-    );
-
-  G.last=now;
-
-  update(dt);
-
-  draw();
-
-  requestAnimationFrame(loop);
-}
-
-
-G.last=
-  performance.now();
-
-requestAnimationFrame(loop);
+$("restartBtn").onclick=
+  startGame;
 
 </script>
 
